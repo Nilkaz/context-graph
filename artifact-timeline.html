@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Artifact evolution timeline</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f4ef;
+    --bg-tertiary: #faf9f6;
+    --text-primary: #1a1a1a;
+    --text-secondary: #5f5e5a;
+    --text-tertiary: #888780;
+    --border-tertiary: rgba(0,0,0,0.10);
+    --border-secondary: rgba(0,0,0,0.18);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1f1e1c;
+      --bg-secondary: #2a2926;
+      --bg-tertiary: #161513;
+      --text-primary: #f1efe8;
+      --text-secondary: #b4b2a9;
+      --text-tertiary: #888780;
+      --border-tertiary: rgba(255,255,255,0.10);
+      --border-secondary: rgba(255,255,255,0.18);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg-tertiary); color: var(--text-primary); font-family: var(--font-sans); font-size: 14px; line-height: 1.6; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 24px 20px 48px; }
+  h1 { font-size: 22px; font-weight: 500; margin: 0 0 4px; }
+  .lede { font-size: 13px; color: var(--text-secondary); margin: 0 0 24px; }
+  select, button { font-family: inherit; font-size: 13px; padding: 6px 10px; border-radius: var(--radius-md); border: 0.5px solid var(--border-secondary); background: var(--bg-primary); color: var(--text-primary); cursor: pointer; }
+  button:hover { background: var(--bg-secondary); }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Artifact evolution timeline</h1>
+<p class="lede">A chronological view of one card's life on the canvas — origin, edits, forks, merges, abandonments — attributed to humans and the agent.</p>
+
+<h2 class="sr-only">Branching artifact timeline with zoom, conversation replay, and per-event author identification.</h2>
+
+<div style="display:flex; gap:8px; align-items:center; margin-bottom: 0.75rem; flex-wrap: wrap;">
+  <label style="font-size:13px; color: var(--text-secondary);">Artifact</label>
+  <select id="artifact-select" style="min-width: 240px;">
+    <option value="0">Bracket geometry (with topology fork)</option>
+    <option value="1">Load-case compliance note (alt-clause fork)</option>
+  </select>
+  <label style="font-size:13px; color: var(--text-secondary); margin-left: 8px;">Focus branch</label>
+  <select id="branch-select" style="min-width: 160px;"></select>
+  <div style="margin-left:auto; display:flex; gap:14px; font-size:12px; color: var(--text-secondary); flex-wrap: wrap;">
+    <span style="display:flex; align-items:center; gap:6px;"><span style="width:10px; height:10px; border-radius:50%; background:#7F77DD;"></span>Human</span>
+    <span style="display:flex; align-items:center; gap:6px;"><span style="width:10px; height:10px; border-radius:50%; background:#1D9E75;"></span>Agent</span>
+  </div>
+</div>
+
+<div style="display:flex; gap:14px; font-size:11px; color: var(--text-tertiary); margin-bottom: 0.5rem; flex-wrap: wrap;">
+  <span>○ fork</span>
+  <span>◌ merge</span>
+  <span>× abandoned</span>
+  <span>⦿ current</span>
+  <span style="margin-left:auto;" id="chip-hint">Zoom in to reveal author chips</span>
+</div>
+
+<div style="background: var(--bg-secondary); border-radius: var(--radius-lg); padding: 1rem 1.25rem 0.5rem; margin-bottom: 0.75rem;">
+  <div style="position:relative; width:100%;">
+    <svg id="overview" viewBox="0 0 680 70" width="100%" height="70" role="img" aria-label="Overview strip with brush selector"></svg>
+  </div>
+  <div style="display:flex; align-items:center; gap:8px; margin: 0.25rem 0 0.75rem; font-size:11px; color: var(--text-tertiary);">
+    <span>Drag the handles to zoom · click a branch label to focus</span>
+    <button id="reset-zoom" style="margin-left:auto; padding: 4px 10px; font-size:12px;">Reset zoom</button>
+  </div>
+  <div style="position:relative; width:100%;">
+    <svg id="tl" viewBox="0 0 680 280" width="100%" height="280" role="img" aria-label="Zoomed branching timeline with author chips"></svg>
+  </div>
+</div>
+
+<div id="detail" style="background: var(--bg-primary); border: 0.5px solid var(--border-tertiary); border-radius: var(--radius-lg); padding: 1rem 1.25rem;">
+  <div style="display:flex; gap:8px; align-items:center; margin-bottom: 8px; flex-wrap: wrap;">
+    <span id="d-branch" style="font-size:11px; padding: 2px 8px; border-radius: 999px; background: var(--bg-secondary); color: var(--text-secondary);">main</span>
+    <div id="d-author-chip" style="display:flex; align-items:center; gap:6px;">
+      <span id="d-avatar" style="width:22px; height:22px; border-radius:50%; background: var(--bg-secondary); color: var(--text-secondary); display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:500;">—</span>
+      <span id="d-author" style="font-size:13px; color: var(--text-primary);">—</span>
+      <span id="d-role" style="font-size:12px; color: var(--text-tertiary);">—</span>
+    </div>
+    <p id="d-time" style="font-size:12px; color: var(--text-tertiary); margin: 0 0 0 auto;">—</p>
+  </div>
+  <p id="d-title" style="font-size:15px; font-weight:500; margin: 0 0 12px;">Click a node on the timeline</p>
+
+  <div id="d-replay" style="display:none;">
+    <div style="border-top: 0.5px solid var(--border-tertiary); padding-top: 12px; margin-bottom: 10px;">
+      <p style="font-size:11px; color: var(--text-tertiary); margin: 0 0 4px; letter-spacing: 0.02em;">Prompt</p>
+      <p id="d-prompt" style="font-size:13px; margin: 0; line-height: 1.6; color: var(--text-primary);"></p>
+    </div>
+    <div style="margin-bottom: 10px;">
+      <p style="font-size:11px; color: var(--text-tertiary); margin: 0 0 4px; letter-spacing: 0.02em;">Response</p>
+      <p id="d-response" style="font-size:13px; margin: 0; line-height: 1.6; color: var(--text-secondary);"></p>
+    </div>
+    <div>
+      <p style="font-size:11px; color: var(--text-tertiary); margin: 0 0 4px; letter-spacing: 0.02em;">Effect on card</p>
+      <p id="d-effect" style="font-size:13px; margin: 0; line-height: 1.6; color: var(--text-secondary);"></p>
+    </div>
+  </div>
+
+  <p id="d-empty" style="font-size:13px; color: var(--text-secondary); margin: 0; line-height: 1.6;">Each node carries its author, the prompt that triggered the change, and the response the Agent produced. Click any node to replay that step.</p>
+</div>
+</div>
+
+<script>
+const AUTHORS = {
+  maya:   { name:"Maya Rodriguez",  initials:"MR", role:"Designer",       color:"#3C3489", bg:"#EEEDFE" },
+  jonas:  { name:"Jonas Hale",      initials:"JH", role:"Mfg engineer",   color:"#0C447C", bg:"#E6F1FB" },
+  priya:  { name:"Priya Shah",      initials:"PS", role:"PM",             color:"#993C1D", bg:"#FAECE7" },
+  sam:    { name:"Sam Okafor",      initials:"SO", role:"Structural eng", color:"#0F6E56", bg:"#E1F5EE" },
+  agent:  { name:"Agent",           initials:"AI", role:"AI assistant",   color:"#085041", bg:"#E1F5EE" }
+};
+
+const DATA = [
+  {
+    name: "Bracket geometry",
+    branches: [
+      { id: "main",  label: "main",          lane: 0 },
+      { id: "topo",  label: "topology fork", lane: 1, parent: "main", forkAt: 14, mergeAt: 38 },
+      { id: "rib",   label: "thin-rib alt",  lane: 2, parent: "main", forkAt: 22, abandonAt: 36 }
+    ],
+    events: [
+      {t:0,  branch:"main", who:"human", actor:"maya",  kind:"create",  label:"Created",          prompt:"Seeding the canvas with the bracket I exported from Fusion.", response:"Imported as a 3D card. Auto-extracted bounding box, material assignment, and 12 named faces.", effect:"Created card bracket-v0 with STEP geometry preview."},
+      {t:8,  branch:"main", who:"agent", actor:"agent", kind:"edit",    label:"Mass + COG calc",  prompt:"Can you compute the mass and center of gravity for this part?", response:"Mass 184 g (Al 6061-T6). COG offset 3.2 mm from datum A toward the rib side. Added a metadata panel.", effect:"Attached metadata panel to bracket-v0."},
+      {t:14, branch:"main", who:"agent", actor:"agent", kind:"fork",    label:"Forked topology",  prompt:"Before changing main, try a topology pass on a fork so we can compare.", response:"Forked branch \"topology fork\". Running solidThinking-style optimizer with the existing load case as the constraint set.", effect:"Spawned bracket-v0-topo as a fork of bracket-v0."},
+      {t:18, branch:"topo", who:"agent", actor:"agent", kind:"edit",    label:"Topology run",     prompt:"Run the optimizer at 0.35 volume fraction and show me the result.", response:"Optimizer converged after 42 iterations. Result removes ~38% volume from the web region while keeping max stress below yield.", effect:"Wrote bracket-v0-topo-r1 geometry preview onto the topology branch."},
+      {t:22, branch:"main", who:"human", actor:"maya",  kind:"fork",    label:"Forked thin-rib",  prompt:"I want to try a thinner rib without all the topology weirdness. Fork a clean alt.", response:"Forked branch \"thin-rib alt\" from main at this step. Carrying forward the v0 geometry and metadata.", effect:"Spawned bracket-v0-rib as a fork of bracket-v0."},
+      {t:26, branch:"rib",  who:"human", actor:"jonas", kind:"edit",    label:"Rib thinned",      prompt:"Reduce rib thickness from 3.2 to 2.4 mm; keep everything else identical.", response:"Updated geometry on the thin-rib branch. Quick check: deflection rises 41% under nominal load; recommend an FEA run.", effect:"Edited bracket-v0-rib geometry; deflection warning attached."},
+      {t:30, branch:"topo", who:"human", actor:"maya",  kind:"edit",    label:"Manual refine",    prompt:"The optimizer left a weird notch on the rib edge — smooth it manually.", response:"Smoothed the rib edge to a 2 mm fillet. Stress concentration drops from 312 to 248 MPa locally.", effect:"Edited bracket-v0-topo-r1 in place."},
+      {t:36, branch:"rib",  who:"human", actor:"sam",   kind:"abandon", label:"Abandoned",        prompt:"FEA on the thin-rib alt is failing deflection. Park this branch.", response:"Marking thin-rib alt as abandoned. The branch stays browsable but won't merge.", effect:"Closed bracket-v0-rib without merging. Reason logged: deflection > 2 mm under L3."},
+      {t:38, branch:"main", who:"agent", actor:"agent", kind:"merge",   label:"Merged topology",  prompt:"The topology fork looks good. Merge it back into main as the new baseline.", response:"Merging topology fork into main. New main carries the optimized geometry plus the manual rib refine.", effect:"Updated bracket-v0 main to v1 (post-merge)."},
+      {t:46, branch:"main", who:"agent", actor:"agent", kind:"edit",    label:"Compliance check", prompt:"Re-run compliance against the merged geometry using the load-case note.", response:"All 14 clauses pass. Clause 3.2 (the rewritten one) is the tightest, with 8% margin.", effect:"Wrote compliance-pass annotation onto bracket-v0."},
+      {t:54, branch:"main", who:"human", actor:"priya", kind:"current", label:"Current",          prompt:"Group sign-off in the free-thinking session — freeze this as the canonical version.", response:"Flagged as current. Downstream cards that depend on bracket-v0 will be notified of the freeze.", effect:"bracket-v0 marked current; lineage closed at v1."}
+    ]
+  },
+  {
+    name: "Load-case compliance note",
+    branches: [
+      { id: "main", label: "main",            lane: 0 },
+      { id: "alt",  label: "alt-clause fork", lane: 1, parent: "main", forkAt: 8, mergeAt: 28 }
+    ],
+    events: [
+      {t:0,  branch:"main", who:"agent", actor:"agent", kind:"create",  label:"Drafted",         prompt:"Draft a compliance summary from the linked code document.", response:"Drafted 14 clauses covering structural, fatigue, and assembly checks. Flagged clause 3.2 as ambiguous.", effect:"Created compliance-note-v0 card."},
+      {t:6,  branch:"main", who:"human", actor:"sam",   kind:"edit",    label:"Edited clauses",  prompt:"Rewrite clause 3.2 to match our actual load envelope, not the generic one.", response:"Rewrote 3.2 with the project load envelope (L1–L4). Tightened the deflection limit to 2.0 mm.", effect:"Edited clause 3.2 on compliance-note-v0."},
+      {t:8,  branch:"main", who:"human", actor:"sam",   kind:"fork",    label:"Forked alt",      prompt:"I'm not sure my wording is right. Fork an alternative interpretation and let's compare.", response:"Forked branch \"alt-clause fork\" from main. Carrying the new clause 3.2 wording across.", effect:"Spawned compliance-note-v0-alt as a fork."},
+      {t:14, branch:"alt",  who:"agent", actor:"agent", kind:"edit",    label:"Cross-checked",   prompt:"Run the alt wording against the last three bracket designs we shipped.", response:"All three pass under the alt wording. Two would fail under the original code wording on fatigue margin.", effect:"Annotated alt branch with cross-check results."},
+      {t:22, branch:"alt",  who:"human", actor:"jonas", kind:"edit",    label:"Refined wording", prompt:"The alt wording is close. Tighten it: use \"shall\" not \"should\" and reference L1–L4 explicitly.", response:"Updated wording. Result is unambiguous and the cross-check still passes.", effect:"Edited clause 3.2 on the alt branch."},
+      {t:28, branch:"main", who:"human", actor:"sam",   kind:"merge",   label:"Merged alt",      prompt:"Adopt the alt wording. Merge it into main.", response:"Merged alt-clause fork into main. compliance-note-v0 now uses the refined wording.", effect:"Updated main; alt branch closed cleanly."},
+      {t:36, branch:"main", who:"human", actor:"priya", kind:"current", label:"Current",         prompt:"Sign off. Link this to the bracket lineage.", response:"Signed off and linked as a dependency of bracket-v0.", effect:"compliance-note-v0 marked current."}
+    ]
+  }
+];
+
+const svg = document.getElementById('tl');
+const ov  = document.getElementById('overview');
+const sel = document.getElementById('artifact-select');
+const branchSel = document.getElementById('branch-select');
+const resetBtn = document.getElementById('reset-zoom');
+const chipHint = document.getElementById('chip-hint');
+
+const dTitle = document.getElementById('d-title');
+const dBranch = document.getElementById('d-branch');
+const dTime = document.getElementById('d-time');
+const dAuthor = document.getElementById('d-author');
+const dRole = document.getElementById('d-role');
+const dAvatar = document.getElementById('d-avatar');
+const dPrompt = document.getElementById('d-prompt');
+const dResponse = document.getElementById('d-response');
+const dEffect = document.getElementById('d-effect');
+const dReplay = document.getElementById('d-replay');
+const dEmpty = document.getElementById('d-empty');
+
+const W = 680, padL = 100, padR = 30, padT = 30, laneGap = 64;
+const OVW = 680, OVPL = 100, OVPR = 30, OVH = 70;
+const COLOR = { human:'#7F77DD', humanDark:'#3C3489', agent:'#1D9E75', agentDark:'#085041', trunk:'#888780', faint:'#D3D1C7', abandoned:'#B4B2A9', brush:'rgba(127,119,221,0.18)', brushBorder:'#7F77DD' };
+const CHIP_ZOOM_THRESHOLD = 0.55;
+
+let state = { artifactIdx: 0, zoomA: 0, zoomB: 1, focusBranch: null };
+
+function escapeXml(s){ return String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+function getMaxT(art){ return Math.max(...art.events.map(e=>e.t), ...art.branches.map(b => b.mergeAt||b.abandonAt||0)); }
+
+function rebuildBranchSelect(){
+  const art = DATA[state.artifactIdx];
+  branchSel.innerHTML = '<option value="">All branches</option>' + art.branches.map(b => `<option value="${b.id}">${escapeXml(b.label)}</option>`).join('');
+  branchSel.value = state.focusBranch || '';
+}
+
+function renderOverview(){
+  const art = DATA[state.artifactIdx];
+  const evs = art.events;
+  const maxT = getMaxT(art);
+  const branches = art.branches;
+  const x = t => OVPL + (OVW - OVPL - OVPR) * (maxT === 0 ? 0 : t / maxT);
+  const yLane = lane => 18 + lane * 12;
+
+  let s = '';
+  branches.forEach(b => {
+    const yy = yLane(b.lane);
+    if (b.lane === 0) {
+      s += `<line x1="${OVPL}" y1="${yy}" x2="${OVW - OVPR}" y2="${yy}" stroke="${COLOR.faint}" stroke-width="1.5"/>`;
+    } else {
+      const startX = x(b.forkAt);
+      const endT = b.mergeAt != null ? b.mergeAt : (b.abandonAt != null ? b.abandonAt : maxT);
+      s += `<line x1="${startX}" y1="${yy}" x2="${x(endT)}" y2="${yy}" stroke="${COLOR.faint}" stroke-width="1.5" ${b.abandonAt!=null?'stroke-dasharray="3 3"':''}/>`;
+    }
+    s += `<text x="${OVPL - 8}" y="${yy + 3}" font-size="10" fill="var(--text-tertiary)" text-anchor="end" class="branch-label" data-bid="${b.id}" style="cursor:pointer;">${escapeXml(b.label)}</text>`;
+  });
+  evs.forEach(e => {
+    const b = branches.find(b => b.id === e.branch);
+    const cy = yLane(b.lane);
+    const fill = e.who === 'human' ? COLOR.human : COLOR.agent;
+    s += `<circle cx="${x(e.t)}" cy="${cy}" r="3" fill="${fill}"/>`;
+  });
+
+  const bx1 = x(state.zoomA * maxT);
+  const bx2 = x(state.zoomB * maxT);
+  s += `<rect x="${bx1}" y="6" width="${bx2 - bx1}" height="${OVH - 12}" fill="${COLOR.brush}" stroke="${COLOR.brushBorder}" stroke-width="1"/>`;
+  s += `<rect class="brush-handle" data-side="L" x="${bx1 - 4}" y="6" width="8" height="${OVH - 12}" fill="${COLOR.brushBorder}" opacity="0.85" style="cursor: ew-resize;"/>`;
+  s += `<rect class="brush-handle" data-side="R" x="${bx2 - 4}" y="6" width="8" height="${OVH - 12}" fill="${COLOR.brushBorder}" opacity="0.85" style="cursor: ew-resize;"/>`;
+  s += `<rect class="brush-body" x="${bx1 + 4}" y="6" width="${Math.max(0, bx2 - bx1 - 8)}" height="${OVH - 12}" fill="transparent" style="cursor: grab;"/>`;
+
+  ov.innerHTML = s;
+  wireBrush();
+
+  ov.querySelectorAll('.branch-label').forEach(el => {
+    el.addEventListener('click', () => {
+      state.focusBranch = el.dataset.bid;
+      branchSel.value = state.focusBranch;
+      renderTimeline();
+    });
+  });
+}
+
+function wireBrush(){
+  let drag = null;
+  const onDown = (e, mode, side) => {
+    e.preventDefault();
+    const rect = ov.getBoundingClientRect();
+    const scale = OVW / rect.width;
+    drag = { mode, side, startX: (e.clientX - rect.left) * scale, startA: state.zoomA, startB: state.zoomB };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  };
+  const onMove = e => {
+    if (!drag) return;
+    const rect = ov.getBoundingClientRect();
+    const scale = OVW / rect.width;
+    const cur = (e.clientX - rect.left) * scale;
+    const inner = OVW - OVPL - OVPR;
+    const delta = (cur - drag.startX) / inner;
+    if (drag.mode === 'handle') {
+      if (drag.side === 'L') state.zoomA = Math.max(0, Math.min(state.zoomB - 0.05, drag.startA + delta));
+      else                   state.zoomB = Math.min(1, Math.max(state.zoomA + 0.05, drag.startB + delta));
+    } else {
+      const span = drag.startB - drag.startA;
+      let a = drag.startA + delta;
+      a = Math.max(0, Math.min(1 - span, a));
+      state.zoomA = a; state.zoomB = a + span;
+    }
+    renderOverview();
+    renderTimeline();
+  };
+  const onUp = () => {
+    drag = null;
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+  };
+  ov.querySelectorAll('.brush-handle').forEach(h => h.addEventListener('pointerdown', e => onDown(e, 'handle', h.dataset.side)));
+  const body = ov.querySelector('.brush-body');
+  if (body) body.addEventListener('pointerdown', e => onDown(e, 'body'));
+}
+
+function renderTimeline(){
+  const art = DATA[state.artifactIdx];
+  const allEvs = art.events;
+  const maxT = getMaxT(art);
+  const tA = state.zoomA * maxT;
+  const tB = state.zoomB * maxT;
+  const zoomSpan = state.zoomB - state.zoomA;
+  const showChips = zoomSpan <= CHIP_ZOOM_THRESHOLD;
+
+  chipHint.textContent = showChips ? 'Author chips on (zoomed in)' : 'Zoom in past ~55% to reveal author chips';
+  chipHint.style.color = showChips ? COLOR.humanDark : 'var(--text-tertiary)';
+
+  const focusBranches = state.focusBranch ? art.branches.filter(b => b.id === state.focusBranch) : art.branches;
+  const focusIds = new Set(focusBranches.map(b => b.id));
+  const visibleLanes = focusBranches.map((b, i) => ({ ...b, _lane: i }));
+  const laneById = Object.fromEntries(visibleLanes.map(b => [b.id, b._lane]));
+  const branchById = Object.fromEntries(art.branches.map(b => [b.id, b]));
+
+  const evs = allEvs.filter(e => focusIds.has(e.branch));
+  const x = t => padL + (W - padL - padR) * ((t - tA) / Math.max(0.0001, tB - tA));
+  const y = lane => padT + lane * laneGap;
+
+  let s = '';
+
+  visibleLanes.forEach(b => {
+    const yy = y(b._lane);
+    s += `<text x="${padL - 12}" y="${yy + 4}" font-size="12" fill="${state.focusBranch === b.id ? COLOR.humanDark : 'var(--text-secondary)'}" text-anchor="end" font-weight="${state.focusBranch === b.id ? '500' : '400'}">${escapeXml(b.label)}</text>`;
+
+    let lineStartT, lineEndT;
+    if (b.lane === 0) {
+      lineStartT = 0;
+      const lastEv = [...allEvs].reverse().find(e => e.branch === b.id);
+      lineEndT = lastEv ? lastEv.t : maxT;
+    } else {
+      lineStartT = b.forkAt;
+      lineEndT = b.mergeAt != null ? b.mergeAt : (b.abandonAt != null ? b.abandonAt : maxT);
+    }
+    const clipA = Math.max(lineStartT, tA);
+    const clipB = Math.min(lineEndT, tB);
+    if (clipB > clipA) {
+      const stroke = b.abandonAt != null ? COLOR.abandoned : COLOR.trunk;
+      const dash = b.abandonAt != null ? 'stroke-dasharray="4 4"' : '';
+      s += `<line x1="${x(clipA)}" y1="${yy}" x2="${x(clipB)}" y2="${yy}" stroke="${stroke}" stroke-width="2" ${dash}/>`;
+    }
+
+    if (b.lane !== 0 && b.forkAt >= tA && b.forkAt <= tB && focusIds.has(b.parent) && laneById[b.parent] != null) {
+      const forkX = x(b.forkAt);
+      const parentY = y(laneById[b.parent]);
+      s += `<path d="M ${forkX} ${parentY} C ${forkX + 18} ${parentY}, ${forkX + 4} ${yy}, ${forkX + 28} ${yy}" stroke="${COLOR.trunk}" stroke-width="2" fill="none"/>`;
+    }
+    if (b.mergeAt != null && b.mergeAt >= tA && b.mergeAt <= tB && focusIds.has(b.parent) && laneById[b.parent] != null) {
+      const mX = x(b.mergeAt);
+      const parentY = y(laneById[b.parent]);
+      s += `<path d="M ${mX} ${yy} C ${mX + 4} ${yy}, ${mX - 18} ${parentY}, ${mX} ${parentY}" stroke="${COLOR.trunk}" stroke-width="2" fill="none"/>`;
+    }
+    if (b.abandonAt != null && b.abandonAt >= tA && b.abandonAt <= tB) {
+      const ax = x(b.abandonAt);
+      s += `<line x1="${ax - 5}" y1="${yy - 5}" x2="${ax + 5}" y2="${yy + 5}" stroke="${COLOR.abandoned}" stroke-width="1.5"/>`;
+      s += `<line x1="${ax - 5}" y1="${yy + 5}" x2="${ax + 5}" y2="${yy - 5}" stroke="${COLOR.abandoned}" stroke-width="1.5"/>`;
+    }
+  });
+
+  evs.forEach((e) => {
+    if (e.t < tA || e.t > tB) return;
+    const lane = laneById[e.branch];
+    if (lane == null) return;
+    const cx = x(e.t);
+    const cy = y(lane);
+    const fill = e.who === 'human' ? COLOR.human : COLOR.agent;
+    const i = allEvs.indexOf(e);
+    const author = AUTHORS[e.actor];
+
+    s += `<g class="node" data-i="${i}" style="cursor:pointer;">`;
+    s += `<circle cx="${cx}" cy="${cy}" r="14" fill="transparent"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="7" fill="${fill}" stroke="var(--bg-secondary)" stroke-width="2"/>`;
+    if (e.kind === 'fork') s += `<circle cx="${cx}" cy="${cy}" r="11" fill="none" stroke="${fill}" stroke-width="1"/>`;
+    else if (e.kind === 'merge') s += `<circle cx="${cx}" cy="${cy}" r="11" fill="none" stroke="${fill}" stroke-width="1" stroke-dasharray="2 2"/>`;
+    else if (e.kind === 'current') { s += `<circle cx="${cx}" cy="${cy}" r="11" fill="none" stroke="${fill}" stroke-width="1.5"/>`; s += `<circle cx="${cx}" cy="${cy}" r="2.5" fill="var(--bg-secondary)"/>`; }
+    s += `<text x="${cx}" y="${cy - 16}" font-size="11" fill="var(--text-secondary)" text-anchor="middle">${escapeXml(e.label)}</text>`;
+
+    if (showChips && author) {
+      const chipX = cx + 11;
+      const chipY = cy + 14;
+      s += `<g transform="translate(${chipX}, ${chipY})">`;
+      s += `<circle cx="0" cy="0" r="9" fill="${author.bg}" stroke="${author.color}" stroke-width="0.75"/>`;
+      s += `<text x="0" y="3" font-size="9" font-weight="500" fill="${author.color}" text-anchor="middle">${escapeXml(author.initials)}</text>`;
+      s += `</g>`;
+    }
+    s += `</g>`;
+  });
+
+  const axisY = padT + visibleLanes.length * laneGap + 4;
+  s += `<line x1="${padL}" y1="${axisY}" x2="${W - padR}" y2="${axisY}" stroke="${COLOR.faint}" stroke-width="1"/>`;
+  s += `<text x="${padL}" y="${axisY + 16}" font-size="11" fill="var(--text-tertiary)">t = ${tA.toFixed(0)}</text>`;
+  s += `<text x="${W - padR}" y="${axisY + 16}" font-size="11" fill="var(--text-tertiary)" text-anchor="end">t = ${tB.toFixed(0)}</text>`;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${axisY + 26}`);
+  svg.innerHTML = s;
+
+  svg.querySelectorAll('.node').forEach(n => {
+    n.addEventListener('click', () => {
+      const i = parseInt(n.dataset.i, 10);
+      showEvent(allEvs[i], branchById);
+    });
+  });
+}
+
+function showEvent(e, branchById){
+  const author = AUTHORS[e.actor] || AUTHORS.agent;
+  dTitle.textContent = e.label;
+  dBranch.textContent = branchById[e.branch].label;
+  dTime.textContent = `t = ${e.t}`;
+  dAuthor.textContent = author.name;
+  dRole.textContent = `· ${author.role}`;
+  dAvatar.textContent = author.initials;
+  dAvatar.style.background = author.bg;
+  dAvatar.style.color = author.color;
+  dPrompt.textContent = e.prompt || '—';
+  dResponse.textContent = e.response || '—';
+  dEffect.textContent = e.effect || '—';
+  dReplay.style.display = '';
+  dEmpty.style.display = 'none';
+}
+
+function resetView(){
+  state.zoomA = 0; state.zoomB = 1; state.focusBranch = null;
+  branchSel.value = '';
+  renderOverview(); renderTimeline();
+}
+
+sel.addEventListener('change', () => { state.artifactIdx = parseInt(sel.value, 10); state.focusBranch = null; state.zoomA = 0; state.zoomB = 1; rebuildBranchSelect(); renderOverview(); renderTimeline(); });
+branchSel.addEventListener('change', () => { state.focusBranch = branchSel.value || null; renderTimeline(); });
+resetBtn.addEventListener('click', resetView);
+
+rebuildBranchSelect();
+renderOverview();
+renderTimeline();
+</script>
+</body>
+</html>

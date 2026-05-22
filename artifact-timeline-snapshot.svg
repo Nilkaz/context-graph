@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 360" width="760" height="360" role="img" aria-label="Static snapshot of the artifact evolution timeline for the bracket geometry artifact.">
+  <title>Artifact evolution timeline — bracket geometry</title>
+  <desc>Branching timeline of a single artifact card on a collaborative AI canvas. Three branches (main, topology fork, thin-rib alt) are shown horizontally over time. Each node is one edit event, colored by actor (purple = human, teal = agent), with author initials chips and event-kind rings.</desc>
+
+  <rect x="0" y="0" width="760" height="360" fill="#faf9f6"/>
+
+  <text x="32" y="34" font-family="-apple-system, sans-serif" font-size="16" font-weight="500" fill="#1a1a1a">Artifact evolution timeline — bracket geometry</text>
+  <text x="32" y="54" font-family="-apple-system, sans-serif" font-size="12" fill="#5f5e5a">One card's life on the canvas: edits, forks, merges, abandonments, attributed to humans and the agent.</text>
+
+  <g font-family="-apple-system, sans-serif" font-size="11" fill="#5f5e5a">
+    <circle cx="450" cy="50" r="5" fill="#7F77DD"/><text x="460" y="54">Human</text>
+    <circle cx="520" cy="50" r="5" fill="#1D9E75"/><text x="530" y="54">Agent</text>
+    <circle cx="585" cy="50" r="6" fill="none" stroke="#5f5e5a" stroke-width="1"/><text x="596" y="54">fork</text>
+    <circle cx="625" cy="50" r="6" fill="none" stroke="#5f5e5a" stroke-width="1" stroke-dasharray="2 2"/><text x="636" y="54">merge</text>
+    <text x="675" y="54">× abandoned</text>
+  </g>
+
+  <text x="115" y="120" font-family="-apple-system, sans-serif" font-size="12" fill="#5f5e5a" text-anchor="end">main</text>
+  <text x="115" y="184" font-family="-apple-system, sans-serif" font-size="12" fill="#5f5e5a" text-anchor="end">topology fork</text>
+  <text x="115" y="248" font-family="-apple-system, sans-serif" font-size="12" fill="#5f5e5a" text-anchor="end">thin-rib alt</text>
+
+  <line x1="125" y1="120" x2="700" y2="120" stroke="#888780" stroke-width="2"/>
+
+  <path d="M 264 120 C 282 120, 268 184, 292 184" stroke="#888780" stroke-width="2" fill="none"/>
+  <line x1="292" y1="184" x2="488" y2="184" stroke="#888780" stroke-width="2"/>
+  <path d="M 488 184 C 492 184, 470 120, 488 120" stroke="#888780" stroke-width="2" fill="none"/>
+
+  <path d="M 350 120 C 368 120, 354 248, 378 248" stroke="#888780" stroke-width="2" fill="none"/>
+  <line x1="378" y1="248" x2="478" y2="248" stroke="#B4B2A9" stroke-width="2" stroke-dasharray="4 4"/>
+  <line x1="473" y1="243" x2="483" y2="253" stroke="#B4B2A9" stroke-width="1.5"/>
+  <line x1="473" y1="253" x2="483" y2="243" stroke="#B4B2A9" stroke-width="1.5"/>
+
+  <g font-family="-apple-system, sans-serif">
+    <g>
+      <text x="125" y="100" font-size="10" fill="#5f5e5a" text-anchor="middle">Created</text>
+      <circle cx="125" cy="120" r="7" fill="#7F77DD" stroke="#faf9f6" stroke-width="2"/>
+      <g transform="translate(136, 134)"><circle r="9" fill="#EEEDFE" stroke="#3C3489" stroke-width="0.75"/><text y="3" font-size="9" font-weight="500" fill="#3C3489" text-anchor="middle">MR</text></g>
+    </g>
+    <g>
+      <text x="210" y="100" font-size="10" fill="#5f5e5a" text-anchor="middle">Mass + COG</text>
+      <circle cx="210" cy="120" r="7" fill="#1D9E75" stroke="#faf9f6" stroke-width="2"/>
+      <g transform="translate(221, 134)"><circle r="9" fill="#E1F5EE" stroke="#085041" stroke-width="0.75"/><text y="3" font-size="9" font-weight="500" fill="#085041" text-anchor="middle">AI</text></g>
+    </g>
+    <g>
+      <text x="264" y="100" font-size="10" fill="#5f5e5a" text-anchor="middle">Forked topology</text>
+      <circle cx="264" cy="120" r="11" fill="none" stroke="#1D9E75" stroke-width="1"/>
+      <circle cx="264" cy="120" r="7" fill="#1D9E75" stroke="#faf9f6" stroke-width="2"/>
+      <g transform="translate(275, 134)"><circle r="9" fill="#E1F5EE" stroke="#085041" stroke-width="0.75"/><text y="3" font-size="9" font-weight="500" fill="#085041" text-anchor="middle">AI</text></g>
+    </g>
+    <g>
+      <text x="320" y="164" font-size="10" fill="#5f5e5a" text-anchor="middle">Topology run</text>
+      <circle cx="320" cy="184" r="7" fill="#1D9E75" stroke="#faf9f6" stroke-width="2"/>
+      <g transform="translate(331, 198)"><circle r="9" fill="#E1F5EE" stroke="#085041" stroke-width="0.75"/><text y="3" font-size="9" font-weight="500" fill="#085041" text-anchor="middle">AI</text></g>
+    </g>
+    <g>
+      <text x="350" y="100" font-size="10" fill="#5f5e5a" text-anchor="middle">Forked thin-rib</text>
+      <circle cx="350" cy="120" r="11" fill="none" stroke="#7F77DD" stroke-width="1"/>
+      <circle cx="350" cy="120" r="7" fill="#7F77DD" stroke="#faf9f6" stroke-width="2"/>
+      <g transform="translate(361, 134)"><circle r="9" fill="#EEEDFE" stroke="#3C3489" stroke-width="0.75"/><text y="3" font-size="9" font-weight="500" fill="#3C3489" text-anchor="middle">MR</text></g>
+    </g>
+    <g>
+      <text x="410" y="228" font-size="10" fill="#5f5e5a" text-anchor="middle">Rib thinned</text>
+      <circle cx="410" cy="248" r="7" fill="#7F77DD" stroke="#faf9f6" stroke-width="2"/>
+      <g transform="translate(421, 262)"><circle r="9" fill="#E6F1FB" stroke="#0C447C" stroke-width="0.75"/><text y="3" font-size="9" font-weight="500" fill="#0C447C" text-anchor="middle">JH</text></g>
+    </g>
+    <g>
+      <text x="440" y="164" font-size="10" fill="#5f5e5a" text-anchor="middle">Manual refine</text>
+      <circle cx="440" cy="184" r="7" fill="#7F77DD" stroke="#faf9f6" stroke-width="2"/>
+      <g transform="translate(451, 198)"><circle r="9" fill="#EEEDFE" stroke="#3C3489" stroke-width="0.75"/><text y="3" font-size="9" font-weight="500" fill="#3C3489" text-anchor="middle">MR</text></g>
+    </g>
+    <g>
+      <text x="488" y="120" font-size="10" fill="#5f5e5a" text-anchor="middle" dy="-20">Merged topology</text>
+      <circle cx="488" cy="120" r="11" fill="none" stroke="#1D9E75" stroke-width="1" stroke-dasharray="2 2"/>
+      <circle cx="488" cy="120" r="7" fill="#1D9E75" stroke="#faf9f6" stroke-width="2"/>
+      <g transform="translate(499, 134)"><circle r="9" fill="#E1F5EE" stroke="#085041" stroke-width="0.75"/><text y="3" font-size="9" font-weight="500" fill="#085041" text-anchor="middle">AI</text></g>
+    </g>
+    <g>
+      <text x="580" y="100" font-size="10" fill="#5f5e5a" text-anchor="middle">Compliance check</text>
+      <circle cx="580" cy="120" r="7" fill="#1D9E75" stroke="#faf9f6" stroke-width="2"/>
+      <g transform="translate(591, 134)"><circle r="9" fill="#E1F5EE" stroke="#085041" stroke-width="0.75"/><text y="3" font-size="9" font-weight="500" fill="#085041" text-anchor="middle">AI</text></g>
+    </g>
+    <g>
+      <text x="660" y="100" font-size="10" fill="#5f5e5a" text-anchor="middle">Current</text>
+      <circle cx="660" cy="120" r="11" fill="none" stroke="#7F77DD" stroke-width="1.5"/>
+      <circle cx="660" cy="120" r="7" fill="#7F77DD" stroke="#faf9f6" stroke-width="2"/>
+      <circle cx="660" cy="120" r="2.5" fill="#faf9f6"/>
+      <g transform="translate(671, 134)"><circle r="9" fill="#FAECE7" stroke="#993C1D" stroke-width="0.75"/><text y="3" font-size="9" font-weight="500" fill="#993C1D" text-anchor="middle">PS</text></g>
+    </g>
+  </g>
+
+  <line x1="125" y1="305" x2="700" y2="305" stroke="#D3D1C7" stroke-width="1"/>
+  <text x="125" y="322" font-family="-apple-system, sans-serif" font-size="11" fill="#888780">origin</text>
+  <text x="700" y="322" font-family="-apple-system, sans-serif" font-size="11" fill="#888780" text-anchor="end">present</text>
+
+  <g font-family="-apple-system, sans-serif" font-size="10" fill="#5f5e5a" transform="translate(125, 340)">
+    <text x="0" y="0">Authors:</text>
+    <g transform="translate(58, -8)"><circle r="7" fill="#EEEDFE" stroke="#3C3489" stroke-width="0.75"/><text y="3" font-size="8" font-weight="500" fill="#3C3489" text-anchor="middle">MR</text></g>
+    <text x="70" y="0">Maya · Designer</text>
+    <g transform="translate(170, -8)"><circle r="7" fill="#E6F1FB" stroke="#0C447C" stroke-width="0.75"/><text y="3" font-size="8" font-weight="500" fill="#0C447C" text-anchor="middle">JH</text></g>
+    <text x="182" y="0">Jonas · Mfg eng</text>
+    <g transform="translate(280, -8)"><circle r="7" fill="#FAECE7" stroke="#993C1D" stroke-width="0.75"/><text y="3" font-size="8" font-weight="500" fill="#993C1D" text-anchor="middle">PS</text></g>
+    <text x="292" y="0">Priya · PM</text>
+    <g transform="translate(360, -8)"><circle r="7" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.75"/><text y="3" font-size="8" font-weight="500" fill="#0F6E56" text-anchor="middle">SO</text></g>
+    <text x="372" y="0">Sam · Structural eng</text>
+    <g transform="translate(480, -8)"><circle r="7" fill="#E1F5EE" stroke="#085041" stroke-width="0.75"/><text y="3" font-size="8" font-weight="500" fill="#085041" text-anchor="middle">AI</text></g>
+    <text x="492" y="0">Agent</text>
+  </g>
+</svg>
